@@ -11,7 +11,7 @@ import csv
 
 today = datetime.date.today()
 table_name = 'dataset'
-table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','location','price']
+table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','price']]
 csv_file = open(f'results-{today.strftime("%y-%d-%m")}.csv', 'w')
 csv.writer = csv.writer(csv_file)
 csv.writer.writerow(table_key)
@@ -27,7 +27,12 @@ model = model.casefold()
 model = model.replace(' ', '-')
 """
 i = 1
-while i <= 50:
+while i <= 330:
+    if i==100 or i==200 or i==300:
+        time.sleep(300)
+    else:
+        pass
+
     response = requests.get(f'https://www.truecar.com/used-cars-for-sale/listings/', params={'page': i}, timeout=30)
     if response.ok == True:
         print(response.url)
@@ -60,7 +65,7 @@ while i <= 50:
                 location_lat = float(location.latitude)
                 location_long = float(location.longitude)
                 """
-                values = [v_model.text, mileage, v_age, v_color, accident, owners, None, price]
+                values = [v_model.text, mileage, v_age, v_color, accident, owners, price]
                 csv.writer.writerow(values)
                 #Insert_Table(table_name, table_key, values)
             except Exception as err:
@@ -70,3 +75,4 @@ while i <= 50:
     else:
         time.sleep(60)
 
+csv_file.close()

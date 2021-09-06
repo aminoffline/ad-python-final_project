@@ -24,6 +24,7 @@ def Insert_Table(Table_name,keys,values):
     sql = f"INSERT INTO {Table_name} ({key}) VALUES ({val})"
     cursor.execute(sql)
     db.commit()
+    print('Data Inserted')
 
 def Read_all_Data(Table_name):
     sql = f"SELECT * FROM {Table_name}"
@@ -43,3 +44,8 @@ def read_all_distinct(Table_name):
     ad = cursor
     return ad
 
+def read_distinct_column(Table_name,column):
+    sql = f"SELECT DISTINCT {column} FROM {Table_name}"
+    cursor.execute(sql)
+    ad  = cursor
+    return ad

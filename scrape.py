@@ -1,14 +1,18 @@
 from bs4 import BeautifulSoup
-from Database import Insert_Table, Read_all_Data
+#from Database import Insert_Table
+import re
 import requests
 import time
 import datetime
 import csv
+#from geopy.geocoders import Nominatim
+
+#geolocator = Nominatim(user_agent="scrape")
 
 today = datetime.date.today()
 table_name = 'dataset'
-table_key = ['vehicle_title', 'vehicle_mileage', 'vehicle_color', 'vehicle_condition', 'vehicle_location', 'vehicle_price']
-csv_file = open(f'results-{today.strftime("%x")}', 'w')
+table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','location','price']
+csv_file = open(f'results-{today.strftime("%y-%d-%m")}.csv', 'w')
 csv.writer = csv.writer(csv_file)
 csv.writer.writerow(table_key)
 
@@ -23,7 +27,7 @@ model = model.casefold()
 model = model.replace(' ', '-')
 """
 i = 1
-while True:
+while i <= 50:
     response = requests.get(f'https://www.truecar.com/used-cars-for-sale/listings/', params={'page': i}, timeout=30)
     if response.ok == True:
         print(response.url)
@@ -31,18 +35,34 @@ while True:
         for post in soup.find_all('div', attrs={"data-test": "cardContent"}):
             try:
                 heading = post.find('div', class_="vehicle-card-top")
-                v_maker_model = heading.find('span', class_="vehicle-header-make-model text-truncate")
-                v_trim = heading.find('div', attrs={"data-test": "vehicleCardTrim"})
+                v_model = heading.find('span', class_="vehicle-header-make-model text-truncate")
                 v_year = heading.find('span', class_="vehicle-card-year font-size-1")
-                car_title = f'{v_maker_model.text} {v_year.text} ,{v_trim.text} '
+                v_age = today.year - int(v_year.text)
                 v_mileage = post.find('div', attrs={"data-test": "vehicleMileage"})
+                mileage = re.match(r'(.+)\smiles', v_mileage.text)
+                mileage = int(mileage.group(1).replace(',', ''))
                 v_color = post.find('div', attrs={"data-test": "vehicleCardColors"})
+                v_color = re.match(r'(.+)\sexterior', v_color.text)
+                v_color = v_color.group(1)
                 v_condition = post.find('div', attrs={"data-test": "vehicleCardCondition"})
-                v_location = post.find('div', attrs={"data-test": "vehicleCardLocation"})
+                condition = re.match(r'(.+)\saccident[s]?.*(.+)\sOwner[s]?', v_condition.text)
+                if condition.group(1) == 'No':
+                    accident = 0
+                else:
+                    accident = int(condition.group(1))
+                owners = int(condition.group(2))
                 v_price = post.find('div', attrs={"data-test": "vehicleListingPriceAmount"})
-                values = [car_title, v_mileage.text, v_color.text, v_condition.text, v_location.text, v_price.text]
-                csv.writer.writerow([car_title, v_mileage.text, v_color.text, v_condition.text, v_location.text, v_price.text])
-                Insert_Table(table_name, table_key, values)
+                price = re.match(r'\$(.+)', v_price.text)
+                price = int(price.group(1).replace(',', ''))
+                """
+                v_location = post.find('div', attrs={"data-test": "vehicleCardLocation"})
+                location = geolocator.geocode(f"{v_location.text}")
+                location_lat = float(location.latitude)
+                location_long = float(location.longitude)
+                """
+                values = [v_model.text, mileage, v_age, v_color, accident, owners, None, price]
+                csv.writer.writerow(values)
+                #Insert_Table(table_name, table_key, values)
             except Exception as err:
                 print(err)
         i += 1

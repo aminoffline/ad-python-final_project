@@ -23,14 +23,17 @@ Tables['dataset'] = (
     ' `id` SMALLINT NOT NULL AUTO_INCREMENT ,'
     ' `model` VARCHAR (100) ,'
     ' `mileage` FLOAT,'
-    ' `year` DATE,'
+    ' `age` DATE,'
+    ' `color` VARCHAR,'
     ' `accident` INT ,'
+    ' `owners` INT,'
+    ' `location` FLOAT,'
     ' `PRICE` FLOAT,'
     ' PRIMARY KEY (`ID`)'
     ') ENGINE=InnoDB'
 )
 
-#key = ['model', 'mileage', 'year', 'accident', 'price']
+#key = ['model', 'mileage', 'age','color', 'accident', 'owners','location','price']
 
 def Create_Tables(Tables):
     cursor.execute(f'USE {DataBase_name}')

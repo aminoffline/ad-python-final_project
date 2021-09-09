@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-#from Database import Insert_Table
+from Database import Insert_Table
 import re
 import requests
 import time
@@ -8,7 +8,7 @@ import csv
 #from geopy.geocoders import Nominatim
 
 #geolocator = Nominatim(user_agent="scrape")
-
+head={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'}
 today = datetime.date.today()
 table_name = 'dataset'
 table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','price']
@@ -16,24 +16,14 @@ csv_file = open(f'results-{today.strftime("%y-%d-%m")}.csv', 'w')
 csv.writer = csv.writer(csv_file)
 csv.writer.writerow(table_key)
 
-"""print('Please enter vehicle Brand for example Alfa-romeo \nEntering WRONG name may cause problem ')
-brand = input('>>>')
-brand = brand.casefold()
-brand = brand.replace(" ", "-")
-
-print('Please enter vehicle model for example giulia \nEntering WRONG name may cause problem ')
-model = input('>>>')
-model = model.casefold()
-model = model.replace(' ', '-')
-"""
 i = 1
-while i <= 330:
+while i <= 312:
     if i==100 or i==200 or i==300:
         time.sleep(300)
     else:
         pass
 
-    response = requests.get(f'https://www.truecar.com/used-cars-for-sale/listings/', params={'page': i}, timeout=30)
+    response = requests.get(f'https://www.truecar.com/used-cars-for-sale/listings/',headers=head, params={'page': i}, timeout=30)
     if response.ok == True:
         print(response.url)
         soup = BeautifulSoup(response.text, 'lxml')
@@ -67,7 +57,7 @@ while i <= 330:
                 """
                 values = [v_model.text, mileage, v_age, v_color, accident, owners, price]
                 csv.writer.writerow(values)
-                #Insert_Table(table_name, table_key, values)
+                Insert_Table(table_name, table_key, values)
             except Exception as err:
                 print(err)
         i += 1

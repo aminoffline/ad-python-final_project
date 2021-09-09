@@ -11,7 +11,7 @@ import csv
 
 today = datetime.date.today()
 table_name = 'dataset'
-table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','price']]
+table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','price']
 csv_file = open(f'results-{today.strftime("%y-%d-%m")}.csv', 'w')
 csv.writer = csv.writer(csv_file)
 csv.writer.writerow(table_key)

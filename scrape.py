@@ -5,10 +5,8 @@ import requests
 import time
 import datetime
 import csv
-#from geopy.geocoders import Nominatim
 
-#geolocator = Nominatim(user_agent="scrape")
-head={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'}
+head = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36'}
 today = datetime.date.today()
 table_name = 'dataset'
 table_key = ['model', 'mileage', 'age','color', 'accident', 'owners','price']
@@ -31,6 +29,7 @@ while i <= 312:
             try:
                 heading = post.find('div', class_="vehicle-card-top")
                 v_model = heading.find('span', class_="vehicle-header-make-model text-truncate")
+                v_model = v_model.text
                 v_year = heading.find('span', class_="vehicle-card-year font-size-1")
                 v_age = today.year - int(v_year.text)
                 v_mileage = post.find('div', attrs={"data-test": "vehicleMileage"})
@@ -49,13 +48,7 @@ while i <= 312:
                 v_price = post.find('div', attrs={"data-test": "vehicleListingPriceAmount"})
                 price = re.match(r'\$(.+)', v_price.text)
                 price = int(price.group(1).replace(',', ''))
-                """
-                v_location = post.find('div', attrs={"data-test": "vehicleCardLocation"})
-                location = geolocator.geocode(f"{v_location.text}")
-                location_lat = float(location.latitude)
-                location_long = float(location.longitude)
-                """
-                values = [v_model.text, mileage, v_age, v_color, accident, owners, price]
+                values = [v_model.casefold(), mileage, v_age, v_color, accident, owners, price]
                 csv.writer.writerow(values)
                 Insert_Table(table_name, table_key, values)
             except Exception as err:

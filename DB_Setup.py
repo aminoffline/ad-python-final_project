@@ -3,6 +3,7 @@ from mysql.connector import errorcode
 
 #DataBase_name = input('Name of DataBase: ')
 DataBase_name = 'final_project'
+#DataBase_name = 'final_project_test'
 
 config = {
     'user': 'Amin',
